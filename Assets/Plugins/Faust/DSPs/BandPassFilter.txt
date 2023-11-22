@@ -1,0 +1,163 @@
+/* ------------------------------------------------------------
+author: "Grame"
+copyright: "(c)GRAME 2006"
+license: "BSD"
+name: "BandPassFilter", "bandFilter"
+version: "2.54.11", "1.0"
+Code generated with Faust 2.60.0 (https://faust.grame.fr)
+Compilation options: -lang cpp -ct 1 -es 1 -mcd 16 -single -ftz 0
+------------------------------------------------------------ */
+
+#ifndef  __mydsp_H__
+#define  __mydsp_H__
+
+#ifndef FAUSTFLOAT
+#define FAUSTFLOAT float
+#endif 
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <math.h>
+
+#ifndef FAUSTCLASS 
+#define FAUSTCLASS mydsp
+#endif
+
+#ifdef __APPLE__ 
+#define exp10f __exp10f
+#define exp10 __exp10
+#endif
+
+#if defined(_WIN32)
+#define RESTRICT __restrict
+#else
+#define RESTRICT __restrict__
+#endif
+
+static float mydsp_faustpower2_f(float value) {
+	return value * value;
+}
+
+class mydsp : public dsp {
+	
+ private:
+	
+	FAUSTFLOAT fEntry0;
+	int fSampleRate;
+	float fConst0;
+	FAUSTFLOAT fEntry1;
+	FAUSTFLOAT fVslider0;
+	float fRec0[3];
+	
+ public:
+	mydsp() {}
+
+	void metadata(Meta* m) { 
+		m->declare("author", "Grame");
+		m->declare("basics_lib_name", "Faust Basic Element Library");
+		m->declare("basics_lib_version", "0.9");
+		m->declare("compile_options", "-single -scal -I libraries/ -I project/ -lang wasm");
+		m->declare("copyright", "(c)GRAME 2006");
+		m->declare("filename", "BandPassFilter.dsp");
+		m->declare("filters_lib_lowpass0_highpass1", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
+		m->declare("filters_lib_name", "Faust Filters Library");
+		m->declare("filters_lib_version", "0.3");
+		m->declare("library_path0", "/libraries/stdfaust.lib");
+		m->declare("library_path1", "/libraries/filters.lib");
+		m->declare("library_path2", "/project/basics.lib");
+		m->declare("library_path3", "/libraries/maths.lib");
+		m->declare("library_path4", "/libraries/platform.lib");
+		m->declare("license", "BSD");
+		m->declare("maths_lib_author", "GRAME");
+		m->declare("maths_lib_copyright", "GRAME");
+		m->declare("maths_lib_license", "LGPL with exception");
+		m->declare("maths_lib_name", "Faust Math Library");
+		m->declare("maths_lib_version", "2.5");
+		m->declare("name", "BandPassFilter");
+		m->declare("platform_lib_name", "Generic Platform Library");
+		m->declare("platform_lib_version", "0.3");
+		m->declare("version", "2.54.11");
+	}
+
+	virtual int getNumInputs() {
+		return 1;
+	}
+	virtual int getNumOutputs() {
+		return 1;
+	}
+	
+	static void classInit(int sample_rate) {
+	}
+	
+	virtual void instanceConstants(int sample_rate) {
+		fSampleRate = sample_rate;
+		fConst0 = 3.1415927f / std::min<float>(1.92e+05f, std::max<float>(1.0f, float(fSampleRate)));
+	}
+	
+	virtual void instanceResetUserInterface() {
+		fEntry0 = FAUSTFLOAT(1e+03f);
+		fEntry1 = FAUSTFLOAT(5e+01f);
+		fVslider0 = FAUSTFLOAT(0.0f);
+	}
+	
+	virtual void instanceClear() {
+		for (int l0 = 0; l0 < 3; l0 = l0 + 1) {
+			fRec0[l0] = 0.0f;
+		}
+	}
+	
+	virtual void init(int sample_rate) {
+		classInit(sample_rate);
+		instanceInit(sample_rate);
+	}
+	virtual void instanceInit(int sample_rate) {
+		instanceConstants(sample_rate);
+		instanceResetUserInterface();
+		instanceClear();
+	}
+	
+	virtual mydsp* clone() {
+		return new mydsp();
+	}
+	
+	virtual int getSampleRate() {
+		return fSampleRate;
+	}
+	
+	virtual void buildUserInterface(UI* ui_interface) {
+		ui_interface->openVerticalBox("Bandfilter");
+		ui_interface->declare(&fEntry1, "style", "knob");
+		ui_interface->addNumEntry("Q factor", &fEntry1, FAUSTFLOAT(5e+01f), FAUSTFLOAT(0.1f), FAUSTFLOAT(1e+02f), FAUSTFLOAT(0.1f));
+		ui_interface->declare(&fEntry0, "style", "knob");
+		ui_interface->declare(&fEntry0, "unit", "Hz");
+		ui_interface->addNumEntry("freq", &fEntry0, FAUSTFLOAT(1e+03f), FAUSTFLOAT(2e+01f), FAUSTFLOAT(2e+04f), FAUSTFLOAT(1.0f));
+		ui_interface->declare(&fVslider0, "unit", "dB");
+		ui_interface->addVerticalSlider("gain", &fVslider0, FAUSTFLOAT(0.0f), FAUSTFLOAT(-5e+01f), FAUSTFLOAT(5e+01f), FAUSTFLOAT(0.1f));
+		ui_interface->closeBox();
+	}
+	
+	virtual void compute(int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOAT** RESTRICT outputs) {
+		FAUSTFLOAT* input0 = inputs[0];
+		FAUSTFLOAT* output0 = outputs[0];
+		float fSlow0 = std::tan(fConst0 * float(fEntry0));
+		float fSlow1 = 2.0f * (mydsp_faustpower2_f(fSlow0) + -1.0f);
+		float fSlow2 = float(fEntry1);
+		float fSlow3 = std::pow(1e+01f, 0.0f - 0.05f * float(fVslider0)) / fSlow2;
+		float fSlow4 = fSlow0 * (fSlow0 - fSlow3) + 1.0f;
+		float fSlow5 = 1.0f / (fSlow0 * (fSlow0 + fSlow3) + 1.0f);
+		float fSlow6 = 1.0f / fSlow2;
+		float fSlow7 = 1.0f - fSlow0 * (fSlow6 - fSlow0);
+		float fSlow8 = fSlow0 * (fSlow0 + fSlow6) + 1.0f;
+		for (int i0 = 0; i0 < count; i0 = i0 + 1) {
+			float fTemp0 = fSlow1 * fRec0[1];
+			fRec0[0] = float(input0[i0]) - fSlow5 * (fSlow4 * fRec0[2] + fTemp0);
+			output0[i0] = FAUSTFLOAT(fSlow5 * (fTemp0 + fSlow8 * fRec0[0] + fSlow7 * fRec0[2]));
+			fRec0[2] = fRec0[1];
+			fRec0[1] = fRec0[0];
+		}
+	}
+
+};
+
+#endif

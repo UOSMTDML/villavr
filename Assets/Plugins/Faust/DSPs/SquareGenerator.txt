@@ -1,0 +1,200 @@
+/* ------------------------------------------------------------
+author: "Grame"
+copyright: "(c)GRAME 2009"
+license: "BSD"
+name: "SquareGenerator", "osci"
+version: "2.54.11", "1.0"
+Code generated with Faust 2.60.0 (https://faust.grame.fr)
+Compilation options: -lang cpp -ct 1 -es 1 -mcd 16 -single -ftz 0
+------------------------------------------------------------ */
+
+#ifndef  __mydsp_H__
+#define  __mydsp_H__
+
+#ifndef FAUSTFLOAT
+#define FAUSTFLOAT float
+#endif 
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <math.h>
+
+#ifndef FAUSTCLASS 
+#define FAUSTCLASS mydsp
+#endif
+
+#ifdef __APPLE__ 
+#define exp10f __exp10f
+#define exp10 __exp10
+#endif
+
+#if defined(_WIN32)
+#define RESTRICT __restrict
+#else
+#define RESTRICT __restrict__
+#endif
+
+static float mydsp_faustpower2_f(float value) {
+	return value * value;
+}
+
+class mydsp : public dsp {
+	
+ private:
+	
+	int iVec0[2];
+	FAUSTFLOAT fHslider0;
+	int fSampleRate;
+	float fConst1;
+	float fRec0[2];
+	float fVec1[2];
+	float fConst2;
+	int IOTA0;
+	float fVec2[4096];
+	float fConst3;
+	float fConst4;
+	float fConst5;
+	FAUSTFLOAT fHslider1;
+	float fRec1[2];
+	
+ public:
+	mydsp() {}
+
+	void metadata(Meta* m) { 
+		m->declare("author", "Grame");
+		m->declare("basics_lib_name", "Faust Basic Element Library");
+		m->declare("basics_lib_version", "0.9");
+		m->declare("compile_options", "-single -scal -I libraries/ -I project/ -lang wasm");
+		m->declare("copyright", "(c)GRAME 2009");
+		m->declare("filename", "SquareGenerator.dsp");
+		m->declare("library_path0", "/libraries/stdfaust.lib");
+		m->declare("library_path1", "/libraries/oscillators.lib");
+		m->declare("library_path2", "/libraries/maths.lib");
+		m->declare("library_path3", "/libraries/platform.lib");
+		m->declare("library_path4", "/project/basics.lib");
+		m->declare("library_path5", "/libraries/signals.lib");
+		m->declare("license", "BSD");
+		m->declare("maths_lib_author", "GRAME");
+		m->declare("maths_lib_copyright", "GRAME");
+		m->declare("maths_lib_license", "LGPL with exception");
+		m->declare("maths_lib_name", "Faust Math Library");
+		m->declare("maths_lib_version", "2.5");
+		m->declare("name", "SquareGenerator");
+		m->declare("oscillators_lib_lf_sawpos_author", "Bart Brouns, revised by Stéphane Letz");
+		m->declare("oscillators_lib_lf_sawpos_licence", "STK-4.3");
+		m->declare("oscillators_lib_name", "Faust Oscillator Library");
+		m->declare("oscillators_lib_sawN_author", "Julius O. Smith III");
+		m->declare("oscillators_lib_sawN_license", "STK-4.3");
+		m->declare("oscillators_lib_version", "0.3");
+		m->declare("platform_lib_name", "Generic Platform Library");
+		m->declare("platform_lib_version", "0.3");
+		m->declare("signals_lib_name", "Faust Signal Routing Library");
+		m->declare("signals_lib_version", "0.3");
+		m->declare("version", "2.54.11");
+	}
+
+	virtual int getNumInputs() {
+		return 0;
+	}
+	virtual int getNumOutputs() {
+		return 1;
+	}
+	
+	static void classInit(int sample_rate) {
+	}
+	
+	virtual void instanceConstants(int sample_rate) {
+		fSampleRate = sample_rate;
+		float fConst0 = std::min<float>(1.92e+05f, std::max<float>(1.0f, float(fSampleRate)));
+		fConst1 = 1.0f / fConst0;
+		fConst2 = 0.25f * fConst0;
+		fConst3 = 0.5f * fConst0;
+		fConst4 = 44.1f / fConst0;
+		fConst5 = 1.0f - fConst4;
+	}
+	
+	virtual void instanceResetUserInterface() {
+		fHslider0 = FAUSTFLOAT(1e+03f);
+		fHslider1 = FAUSTFLOAT(0.0f);
+	}
+	
+	virtual void instanceClear() {
+		for (int l0 = 0; l0 < 2; l0 = l0 + 1) {
+			iVec0[l0] = 0;
+		}
+		for (int l1 = 0; l1 < 2; l1 = l1 + 1) {
+			fRec0[l1] = 0.0f;
+		}
+		for (int l2 = 0; l2 < 2; l2 = l2 + 1) {
+			fVec1[l2] = 0.0f;
+		}
+		IOTA0 = 0;
+		for (int l3 = 0; l3 < 4096; l3 = l3 + 1) {
+			fVec2[l3] = 0.0f;
+		}
+		for (int l4 = 0; l4 < 2; l4 = l4 + 1) {
+			fRec1[l4] = 0.0f;
+		}
+	}
+	
+	virtual void init(int sample_rate) {
+		classInit(sample_rate);
+		instanceInit(sample_rate);
+	}
+	virtual void instanceInit(int sample_rate) {
+		instanceConstants(sample_rate);
+		instanceResetUserInterface();
+		instanceClear();
+	}
+	
+	virtual mydsp* clone() {
+		return new mydsp();
+	}
+	
+	virtual int getSampleRate() {
+		return fSampleRate;
+	}
+	
+	virtual void buildUserInterface(UI* ui_interface) {
+		ui_interface->openVerticalBox("Oscillator");
+		ui_interface->declare(&fHslider0, "unit", "Hz");
+		ui_interface->addHorizontalSlider("freq", &fHslider0, FAUSTFLOAT(1e+03f), FAUSTFLOAT(1e+01f), FAUSTFLOAT(1e+04f), FAUSTFLOAT(1.0f));
+		ui_interface->declare(&fHslider1, "unit", "dB");
+		ui_interface->addHorizontalSlider("volume", &fHslider1, FAUSTFLOAT(0.0f), FAUSTFLOAT(-96.0f), FAUSTFLOAT(0.0f), FAUSTFLOAT(0.1f));
+		ui_interface->closeBox();
+	}
+	
+	virtual void compute(int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOAT** RESTRICT outputs) {
+		FAUSTFLOAT* output0 = outputs[0];
+		float fSlow0 = std::max<float>(float(fHslider0), 23.44895f);
+		float fSlow1 = std::max<float>(2e+01f, std::fabs(fSlow0));
+		float fSlow2 = fConst1 * fSlow1;
+		float fSlow3 = fConst2 / fSlow1;
+		float fSlow4 = std::max<float>(0.0f, std::min<float>(2047.0f, fConst3 / fSlow0));
+		int iSlow5 = int(fSlow4);
+		int iSlow6 = iSlow5 + 1;
+		float fSlow7 = std::floor(fSlow4);
+		float fSlow8 = fSlow4 - fSlow7;
+		float fSlow9 = fSlow7 + (1.0f - fSlow4);
+		float fSlow10 = fConst4 * std::pow(1e+01f, 0.05f * float(fHslider1));
+		for (int i0 = 0; i0 < count; i0 = i0 + 1) {
+			iVec0[0] = 1;
+			fRec0[0] = fSlow2 + (fRec0[1] - std::floor(fSlow2 + fRec0[1]));
+			float fTemp0 = mydsp_faustpower2_f(2.0f * fRec0[0] + -1.0f);
+			fVec1[0] = fTemp0;
+			float fTemp1 = fSlow3 * float(iVec0[1]) * (fTemp0 - fVec1[1]);
+			fVec2[IOTA0 & 4095] = fTemp1;
+			fRec1[0] = fSlow10 + fConst5 * fRec1[1];
+			output0[i0] = FAUSTFLOAT(fRec1[0] * (fTemp1 - (fSlow9 * fVec2[(IOTA0 - iSlow5) & 4095] + fSlow8 * fVec2[(IOTA0 - iSlow6) & 4095])));
+			iVec0[1] = iVec0[0];
+			fRec0[1] = fRec0[0];
+			fVec1[1] = fVec1[0];
+			IOTA0 = IOTA0 + 1;
+			fRec1[1] = fRec1[0];
+		}
+	}
+
+};
+
+#endif

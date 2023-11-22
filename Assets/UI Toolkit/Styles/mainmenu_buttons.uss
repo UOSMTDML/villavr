@@ -1,0 +1,25 @@
+.button-main-title {
+    -unity-font-style: bold;
+    font-size: 32px;
+    background-color: rgb(55, 62, 144);
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    color: rgb(255, 255, 255);
+}
+
+.button-main-title:hover {
+    background-color: rgb(80, 93, 221);
+}
+
+.button-main-title:active {
+    background-color: rgb(55, 58, 144);
+}
+
+.textfield-main-title {
+}
