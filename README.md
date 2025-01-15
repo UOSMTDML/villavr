@@ -3,6 +3,10 @@
 An adaptable famework for cooperative and interactive musical learning environments powered by FAUST-based modules for sound synthesis. 
 
 
+#### Video showcase on YouTube 
+
+[![Video showcase](https://img.youtube.com/vi/QPSZzgXTLo0/0.jpg)](https://www.youtube.com/watch?v=QPSZzgXTLo0)
+
 
 #### Installation requirements 
 
